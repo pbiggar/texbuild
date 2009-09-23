@@ -20,7 +20,13 @@ import os
 import hashlib
 
 def get_input_files(base):
-	lines = open(base + ".fls", "r").readlines ()
+	try:
+		lines = open(base + ".fls", "r").readlines ()
+	except Exception:
+		# If the file doesnt exist, it'll be fixed later, when they see an empty list, and run it again.
+		debug (".fls file missing")
+		return []
+
 	result = set()
 	for line in lines:
 		(before, _, after) = line.rstrip().partition (" ")
@@ -29,12 +35,27 @@ def get_input_files(base):
 
 	return result
 
-filename = "thesis.tex"
-base = "thesis"
+def debug (message):
+	print str(time.strftime("%H:%M:%S")) + " - " + message
 
+def msg (message):
+	print str(time.strftime("%H:%M:%S")) + " - " + message
+
+
+filename = "thesis.tex"
+final = "thesis.pdf"
+base = "thesis"
+logfile = base + ".texbuild.log"
 
 latex = ["pdflatex", "-recorder", "-interaction=nonstopmode", filename]
 bibtex = ["bibtex", base]
+
+
+# Start the logfile again
+if os.path.exists(logfile):
+	debug ("delete logfile")
+	os.remove (logfile)
+
 
 timestamps = {}
 md5s = {}
@@ -44,35 +65,85 @@ while (True):
 
 	files = get_input_files (base)
 
+	# No .fls file
+	if len (files) == 0:
+		files = [filename]
+
+
 	# Keep checking the files until a timestamp changes
 	build = False
 	while build == False:
+
+		time.sleep (0.2)
 		for f in files:
 
 			# First check the timestamp
-			t = os.path.getmtime(f)
-			if t > timestamps.get (f, 0):
-#				print f + " has a newer timestamp"
-				timestamps[f] = t
+			try:
+				t = os.path.getmtime(f)
+			except Exception:
+				debug ("Time stamp error, always build")
+				build = True
+			else:
+				if t > timestamps.get (f, 0):
+					debug (f + " has a newer timestamp")
+					timestamps[f] = t
 
-				# Check if it has actually changed
-				m = hashlib.md5( open( f, "r" ).read()).hexdigest()
-				if m != md5s.get (f, ""):
-					print f + " has changed"
-					md5s[f] = m
-					build = True
+					# Check if it has actually changed
+					m = hashlib.md5( open( f, "r" ).read()).hexdigest()
+					if m != md5s.get (f, ""):
+						debug (f + " has changed")
+						md5s[f] = m
+						build = True
+
+
+		# If the .pdf if missing, build it
+		if not os.path.exists(final):
+			debug ("pdf missing, always build")
+			build = True
+
 
 
 	# Now build it
 
 
 	# We dont care about outputs or exit code
-	subprocess.call (latex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	msg ("Beginning build")
 	subprocess.call (bibtex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	print "Rebuilt at " + time.ctime()
+	p = subprocess.Popen (latex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-	# Copy it to refresh the viewer
-	shutil.copy ("thesis.pdf", "t.pdf")
+	# This can hang. Don't wait longer than 30 seconds
+	start = time.time ()
+	while True:
+		retcode = p.poll()
+		debug ("polling: " + str(retcode))
+
+		if retcode != None:
+			break;
+
+		# It might timeout
+		finish = time.time ()
+		if finish > start + 30:
+			try:
+				#p.terminate()
+				p.kill()
+			except Exception:
+				pass
+
+			debug ("Timeout (" + str(finish - start) + ") running: " + " ".join (latex))
+			break
+
+		debug ("Still building")
+		time.sleep (0.2)
+
+	msg ("Built");
+
+
+	if os.path.exists(final):
+		debug ("copying pdf")
+		# Copy it to refresh the viewer
+		shutil.copy ("thesis.pdf", "t.pdf")
+
+	debug ("copying log")
 	shutil.copy ("thesis.log", "t.log")
 
 
