@@ -36,9 +36,11 @@ def get_input_files(base):
 	return result
 
 def debug (message):
-	print str(time.strftime("%H:%M:%S")) + " - " + message
+	global logfile
+	print >>logfile, time.strftime("%H:%M:%S") + " - " + message
 
 def msg (message):
+	debug (message)
 	print str(time.strftime("%H:%M:%S")) + " - " + message
 
 
@@ -53,8 +55,11 @@ bibtex = ["bibtex", base]
 
 # Start the logfile again
 if os.path.exists(logfile):
-	debug ("delete logfile")
 	os.remove (logfile)
+
+logfile = open ("texbuild.log", "w")
+
+
 
 
 timestamps = {}
@@ -75,6 +80,8 @@ while (True):
 	while build == False:
 
 		time.sleep (0.2)
+		new_timestamps = []
+		changed_files = []
 		for f in files:
 
 			# First check the timestamp
@@ -85,15 +92,21 @@ while (True):
 				build = True
 			else:
 				if t > timestamps.get (f, 0):
-					debug (f + " has a newer timestamp")
+					new_timestamps.append (f)
 					timestamps[f] = t
 
 					# Check if it has actually changed
 					m = hashlib.md5( open( f, "r" ).read()).hexdigest()
 					if m != md5s.get (f, ""):
-						debug (f + " has changed")
+						changed_files.append (f)
 						md5s[f] = m
 						build = True
+
+
+		if len (changed_files):		
+			msg ("Changed files: " + ", ".join (changed_files))
+		elif len (new_timestamps):
+			msg ("Touched files: " + ", ".join (new_timestamps))
 
 
 		# If the .pdf if missing, build it
@@ -111,11 +124,13 @@ while (True):
 	subprocess.call (bibtex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	p = subprocess.Popen (latex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-	# This can hang. Don't wait longer than 30 seconds
+	# This can hang. Don't wait longer than 20 seconds (when it takes longer,
+	# its generally building something incredibly broken, possibly because it
+	# saved just after an open brace was added, and it can't make sense of the
+	# thing.
 	start = time.time ()
 	while True:
 		retcode = p.poll()
-		debug ("polling: " + str(retcode))
 
 		if retcode != None:
 			break;
@@ -132,7 +147,6 @@ while (True):
 			debug ("Timeout (" + str(finish - start) + ") running: " + " ".join (latex))
 			break
 
-		debug ("Still building")
 		time.sleep (0.2)
 
 	msg ("Built");
@@ -140,7 +154,9 @@ while (True):
 
 	if os.path.exists(final):
 		debug ("copying pdf")
-		# Copy it to refresh the viewer
+
+		# Delete before copying for okular
+		os.remove ("t.pdf")
 		shutil.copy ("thesis.pdf", "t.pdf")
 
 	debug ("copying log")
