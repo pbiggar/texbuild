@@ -161,5 +161,6 @@ while (True):
 
 	debug ("copying log")
 	shutil.copy ("thesis.log", "t.log")
+	shutil.copy ("thesis.aux", "t.aux") # for bibtex
 
 
