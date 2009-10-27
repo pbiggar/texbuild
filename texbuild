@@ -36,28 +36,31 @@ def get_input_files(base):
 	return result
 
 def debug (message):
-	global logfile
-	print >>logfile, time.strftime("%H:%M:%S") + " - " + message
+	global logfileobject
+	print >>logfileobject, time.strftime("%H:%M:%S") + " - " + message
 
 def msg (message):
 	debug (message)
 	print str(time.strftime("%H:%M:%S")) + " - " + message
 
 
-filename = "thesis.tex"
-final = "thesis.pdf"
-base = "thesis"
-logfile = base + ".texbuild.log"
+base = "so_talk"
+filename = base + ".tex"
+final = base + ".pdf"
+logfile = base + ".log"
+auxfile = base + ".aux"
+
+texbuildlogfile = "texbuild.log"
 
 latex = ["pdflatex", "-recorder", "-interaction=nonstopmode", filename]
 bibtex = ["bibtex", base]
 
 
 # Start the logfile again
-if os.path.exists(logfile):
-	os.remove (logfile)
+if os.path.exists(texbuildlogfile):
+	os.remove (texbuildlogfile)
 
-logfile = open ("texbuild.log", "w")
+logfileobject = open (texbuildlogfile, "w")
 
 
 
@@ -111,7 +114,7 @@ while (True):
 
 		# If the .pdf if missing, build it
 		if not os.path.exists(final):
-			debug ("pdf missing, always build")
+			msg ("PDF missing")
 			build = True
 
 
@@ -156,11 +159,12 @@ while (True):
 		debug ("copying pdf")
 
 		# Delete before copying for okular
-		os.remove ("t.pdf")
-		shutil.copy ("thesis.pdf", "t.pdf")
+		if os.path.exists("t.pdf"):
+			os.remove ("t.pdf")
+		shutil.copy (final, "t.pdf")
 
 	debug ("copying log")
-	shutil.copy ("thesis.log", "t.log")
-	shutil.copy ("thesis.aux", "t.aux") # for bibtex
+	shutil.copy (logfile, "t.log")
+	shutil.copy (auxfile, "t.aux") # for bibtex
 
 
