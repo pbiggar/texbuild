@@ -17,6 +17,7 @@ import subprocess
 import shutil
 import time 
 import os
+import sys
 import hashlib
 
 def get_input_files(base):
@@ -44,8 +45,8 @@ def msg (message):
 	print str(time.strftime("%H:%M:%S")) + " - " + message
 
 
-base = "so_talk"
-filename = base + ".tex"
+filename = sys.argv[1]
+base = os.path.splitext (os.path.basename (filename))[0]
 final = base + ".pdf"
 logfile = base + ".log"
 auxfile = base + ".aux"
