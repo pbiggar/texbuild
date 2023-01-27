@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # Continuously builds a latex document, refreshing it only when it has changed.
 
@@ -38,11 +38,11 @@ def get_input_files(base):
 
 def debug (message):
 	global logfileobject
-	print >>logfileobject, time.strftime("%H:%M:%S") + " - " + message
+	print(time.strftime("%H:%M:%S") + " - " + message, file=logfileobject)
 
 def msg (message):
 	debug (message)
-	print str(time.strftime("%H:%M:%S")) + " - " + message
+	print(str(time.strftime("%H:%M:%S")) + " - " + message)
 
 
 filename = sys.argv[1]
