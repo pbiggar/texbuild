@@ -100,7 +100,7 @@ while (True):
 					timestamps[f] = t
 
 					# Check if it has actually changed
-					m = hashlib.md5( open( f, "r" ).read()).hexdigest()
+					m = hashlib.md5( open( f, "r" ).read().encode('utf-8')).hexdigest()
 					if m != md5s.get (f, ""):
 						changed_files.append (f)
 						md5s[f] = m
