@@ -41,12 +41,10 @@ def get_input_files(base):
 	return result
 
 def debug (message):
-	global logfileobject
-	print(time.strftime("%H:%M:%S") + " - " + message, file=logfileobject)
+	print(time.strftime("%H:%M:%S") + " - " + message)
 
 def msg (message):
 	debug (message)
-	print(str(time.strftime("%H:%M:%S")) + " - " + message)
 
 subprocess.call(['mkdir', '-p', outputdir])
 
@@ -56,8 +54,6 @@ final = os.path.join(outputdir, base + ".pdf")
 logfile = base + ".log"
 auxfile = base + ".aux"
 
-texbuildlogfile = "texbuild.log"
-
 latex = ["pdflatex",
          "-recorder", 
          "-interaction=nonstopmode", 
@@ -66,15 +62,8 @@ latex = ["pdflatex",
 
 bibtex = ["bibtex", os.path.join(outputdir, base)]
 
-# Start the logfile again
-if os.path.exists(texbuildlogfile):
-	os.remove (texbuildlogfile)
-
-logfileobject = open (texbuildlogfile, "w")
-
 timestamps = {}
 md5s = {}
-
 
 while (True):
 
