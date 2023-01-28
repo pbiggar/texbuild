@@ -27,7 +27,7 @@ import hashlib
 
 def get_input_files(base):
 	try:
-		lines = open(base + ".fls", "r").readlines ()
+		lines = open(os.path.join(outputdir, base + ".fls"), "r").readlines ()
 	except Exception:
 		# If the file doesnt exist, it'll be fixed later, when they see an empty list, and run it again.
 		debug (".fls file missing")
@@ -173,10 +173,6 @@ while (True):
 		if os.path.exists(build_path):
 			os.remove (build_path)
 		shutil.copy (final, build_path)
-
-	bbl_path = os.path.join(outputdir, f'{base}.bbl')
-	if os.path.exists(bbl_path):
-		shutil.copy(bbl_path, base)
 
 	debug ("copying log")
 	# shutil.copy (logfile, "t.log")
