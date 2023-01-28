@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# ==== CONFIG VARIABLES ====
+
+outputdir = "output"
+outputfilebasename = "build"
+
 
 # Continuously builds a latex document, refreshing it only when it has changed.
 
@@ -47,15 +52,19 @@ def msg (message):
 
 filename = sys.argv[1]
 base = os.path.splitext (os.path.basename (filename))[0]
-final = base + ".pdf"
+final = os.path.join(outputdir, base + ".pdf")
 logfile = base + ".log"
 auxfile = base + ".aux"
 
 texbuildlogfile = "texbuild.log"
 
-latex = ["pdflatex", "-recorder", "-interaction=nonstopmode", filename]
-bibtex = ["bibtex", base]
+latex = ["pdflatex",
+         "-recorder", 
+         "-interaction=nonstopmode", 
+         "-output-directory", outputdir, 
+         filename]
 
+bibtex = ["bibtex", os.path.join(outputdir, base)]
 
 # Start the logfile again
 if os.path.exists(texbuildlogfile):
@@ -81,7 +90,7 @@ while (True):
 
 	# Keep checking the files until a timestamp changes
 	build = False
-	while build == False:
+	while not build:
 
 		time.sleep (0.2)
 		new_timestamps = []
@@ -155,17 +164,22 @@ while (True):
 
 	msg ("Built");
 
+	build_path = os.path.join(outputdir, f'{outputfilebasename}.pdf')
 
 	if os.path.exists(final):
 		debug ("copying pdf")
 
 		# Delete before copying for okular
-		if os.path.exists("t.pdf"):
-			os.remove ("t.pdf")
-		shutil.copy (final, "t.pdf")
+		if os.path.exists(build_path):
+			os.remove (build_path)
+		shutil.copy (final, build_path)
+
+	bbl_path = os.path.join(outputdir, f'{base}.bbl')
+	if os.path.exists(bbl_path):
+		shutil.copy(bbl_path, base)
 
 	debug ("copying log")
-	shutil.copy (logfile, "t.log")
-	shutil.copy (auxfile, "t.aux") # for bibtex
+	# shutil.copy (logfile, "t.log")
+	# shutil.copy (auxfile, "t.aux") # for bibtex
 
 
