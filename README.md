@@ -1,7 +1,11 @@
-This small script continuously builds a latex file in the background.
-Importantly, it only overwrites the target pdf file upon a successful and complete build.
-This allows you to watch the PDf in a PDF viewer without the PDF viewer corrupting or crashing because of an incomplete PDF.
+This small script continuously builds a latex file in the background and outputs all files into a folder of your choice (default `output/`). Of note is the build file (default `output/build.pdf`) which is what you should open in a pdf viewer of your choice while editing your LaTeX document.
 
-See http://stackoverflow.com/questions/1240037/recommended-build-system-for-latex/1394702#1394702 for motivation and usage instruction.
+It is less jarring and looks cleaner than what I used to use (`latexmk -pvc`) (The final build file only updates on a successful and complete build. Other build tools will write an incomplete pdf that your pdf viewer can't handle, leading to a broken pdf for a few seconds while you are editing) I also think it's faster, but that might just be the placebo effect.
 
-Note: This repository is a fork. There are two major updates; firstly, it works for python3, secondly, it puts all output in a folder (default folder name is 'output', however that can be changed using the config variables at the top of `texbuild.py`)
+See [the original stack overflow post](http://stackoverflow.com/questions/1240037/recommended-build-system-for-latex/1394702#1394702) for motivation, usage instruction, and some spicy vim configuration.
+
+Note, this repository is a fork. Changes:
+
+ 1. Updated to python3
+ 2. All output is placed in a folder (default `output/`, modifiable using the config variables at the top of the script)
+ 3. You can choose the name of the final built pdf (default `output/build.pdf`, modifiable using the config variables at the top of the script)
