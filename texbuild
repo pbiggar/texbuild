@@ -4,7 +4,6 @@
 outputdir = "output"
 outputfilebasename = "build"
 
-
 # Continuously builds a latex document, refreshing it only when it has changed.
 
 # What makes this different from latexmk, is that it just continually builds in
@@ -49,6 +48,7 @@ def msg (message):
 	debug (message)
 	print(str(time.strftime("%H:%M:%S")) + " - " + message)
 
+subprocess.call(['mkdir', '-p', outputdir])
 
 filename = sys.argv[1]
 base = os.path.splitext (os.path.basename (filename))[0]
@@ -71,9 +71,6 @@ if os.path.exists(texbuildlogfile):
 	os.remove (texbuildlogfile)
 
 logfileobject = open (texbuildlogfile, "w")
-
-
-
 
 timestamps = {}
 md5s = {}
