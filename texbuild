@@ -160,7 +160,7 @@ while (True):
 			os.remove (build_path)
 		shutil.copy (final, build_path)
 
-	debug ("copying log")
+	# debug ("copying log")
 	# shutil.copy (logfile, "t.log")
 	# shutil.copy (auxfile, "t.aux") # for bibtex
 
