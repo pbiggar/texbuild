@@ -120,7 +120,15 @@ while (True):
 
     # We dont care about outputs or exit code
     msg ("Beginning build")
-    subprocess.call (bibtex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # running bibtex on every aux file
+    for filename in os.listdir(outputdir):
+        if ".aux" in filename:
+            auxfile_basename = os.path.splitext(filename)[0]
+            bibtex_target    = os.path.join(outputdir, auxfile_basename)
+            subprocess.call (["bibtex", bibtex_target],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+
     p = subprocess.Popen (latex, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # This can hang. Don't wait longer than 20 seconds (when it takes longer,
