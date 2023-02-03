@@ -146,7 +146,6 @@ while (True):
         finish = time.time ()
         if finish > start + 30:
             try:
-                #p.terminate()
                 p.kill()
             except Exception:
                 pass
@@ -167,9 +166,3 @@ while (True):
         if os.path.exists(build_path):
             os.remove (build_path)
         shutil.copy (final, build_path)
-
-    # debug ("copying log")
-    # shutil.copy (logfile, "t.log")
-    # shutil.copy (auxfile, "t.aux") # for bibtex
-
-
