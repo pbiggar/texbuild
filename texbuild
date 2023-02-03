@@ -46,7 +46,7 @@ def debug (message):
 def msg (message):
     debug (message)
 
-subprocess.call(['mkdir', '-p', outputdir])
+os.makedirs(outputdir, exist_ok=True)
 
 filename = sys.argv[1]
 base = os.path.splitext (os.path.basename (filename))[0]
