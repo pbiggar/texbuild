@@ -43,9 +43,6 @@ def get_input_files(base):
 def debug (message):
     print(time.strftime("%H:%M:%S") + " - " + message)
 
-def msg (message):
-    debug (message)
-
 os.makedirs(outputdir, exist_ok=True)
 
 filename = sys.argv[1]
@@ -108,14 +105,14 @@ while (True):
 
 
         if len (changed_files):
-            msg ("Changed files: " + ", ".join (changed_files))
+            debug("Changed files: " + ", ".join (changed_files))
         elif len (new_timestamps):
-            msg ("Touched files: " + ", ".join (new_timestamps))
+            debug("Touched files: " + ", ".join (new_timestamps))
 
 
         # If the .pdf if missing, build it
         if not os.path.exists(final):
-            msg ("PDF missing")
+            debug("PDF missing")
             build = True
 
 
@@ -124,7 +121,7 @@ while (True):
 
 
     # We dont care about outputs or exit code
-    msg ("Beginning build")
+    debug("Beginning build")
     # running bibtex on every aux file
     for filename in os.listdir(outputdir):
         if ".aux" in filename:
@@ -160,7 +157,7 @@ while (True):
 
         time.sleep (0.2)
 
-    msg ("Built");
+    debug("Built");
 
     build_path = os.path.join(outputdir, f'{outputfilebasename}.pdf')
 
