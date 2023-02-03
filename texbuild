@@ -76,9 +76,14 @@ while (True):
 
     # Keep checking the files until a timestamp changes
     build = False
+    time_to_wait = 0.05
     while not build:
 
-        time.sleep (0.2)
+        time.sleep (time_to_wait)
+        # increase time_to_wait each loop
+        # if the user is idle, this saves marginal system resources
+        time_to_wait += 0.001
+
         new_timestamps = []
         changed_files = []
         for f in files:
